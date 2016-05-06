@@ -1,0 +1,65 @@
+cmake_minimum_required(VERSION 2.8.3)
+project(obstacle_avoidance)
+
+## Find catkin macros and libraries
+## if COMPONENTS list like find_package(catkin REQUIRED COMPONENTS xyz)
+## is used, also find other catkin packages
+find_package(catkin REQUIRED COMPONENTS
+  geometry_msgs
+  nav_msgs
+  roscpp
+  std_msgs
+  tf
+)
+
+## System dependencies are found with CMake's conventions
+# find_package(Boost REQUIRED COMPONENTS system)
+
+
+## Uncomment this if the package has a setup.py. This macro ensures
+## modules and global scripts declared therein get installed
+## See http://ros.org/doc/api/catkin/html/user_guide/setup_dot_py.html
+# catkin_python_setup()
+
+################################################
+## Declare ROS messages, services and actions ##
+################################################
+
+################################################
+## Declare ROS dynamic reconfigure parameters ##
+################################################
+
+###################################
+## catkin specific configuration ##
+###################################
+catkin_package(
+  INCLUDE_DIRS include
+  LIBRARIES obstacle_avoidance
+#  CATKIN_DEPENDS geometry_msgs nav_msgs roscpp std_msgs
+#  DEPENDS system_lib
+)
+
+###########
+## Build ##
+###########
+
+include_directories(
+  ${catkin_INCLUDE_DIRS}
+  include
+)
+
+## Declare a C++ library
+add_library(${PROJECT_NAME} src/bug1.cpp src/math.cpp src/bug2.cpp)
+
+## Declare a C++ executable
+add_executable(bug_node nodes/bug_node.cpp)
+target_link_libraries(bug_node ${catkin_LIBRARIES} ${PROJECT_NAME})
+
+#############
+## Install ##
+#############
+
+#############
+## Testing ##
+#############
+
