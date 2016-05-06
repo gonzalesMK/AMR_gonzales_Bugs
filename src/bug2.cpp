@@ -4,6 +4,10 @@
 //Flag para o sensor frontal
 
 namespace bug{
+    /** constantes
+    */
+    const double V_ESQUERDA = -5;
+    const double V_ESQUERDA = 5;
     /**
     *  Empty constructor
     */
@@ -52,13 +56,24 @@ namespace bug{
     * Wall Following function: Computes desired twist that allows robot circum-navagiating a wall/obstacle.
     */
     void Bug2::wallFollower(void){
-        /** QUANDO APENAS O SENSOR DA FRENTE ACIONA, E O LATERAL AINDA NÃO FOI ACIONADO, ELE VIRA PARA A DIREITA E ANDA DEVAGAR
-            QUANDO O SENSOR LATERAL ESQUERDO E FRONTAL ACIONAM JUNTOS, ELE VIRA PARA A DIRETA E ANDA DEVAGAR
-            QUANDO O ESQUERDO ESTÁ PERTO E ACIONA SOZINHO, ELE VIRA PARA A DIREITA
-            QUANDO O ESQUERDO ESTÁ LONGE E ACIONA SOZINHO, ELE VIRA PARA A ESQUERDA
-            SENÃO, E SE O SENSOR DA FRENTE NÃO ESTIVER ACIONADO, VIRA PARA A ESQUERDA*/
-     
-        if(this->)
+        // Se o sensor da frente ativar...
+        if( this->sonarArray[FRONT_SONAR] > 0 ){
+            //Se o sensor lateral esquerdo não estiver ativado, o carro vira para a ESQUERDA
+            if (this->sonarArrau[LEFT_SONAR] == 0){
+                this->twist.angular.z = V_ESQUERDA;
+            } else {
+            //Senão vira para a DIREITA
+                this->twist.angular.z = V_DIREITA;
+            }
+            
+        } else if (this->sonarArray[RIGHT_SONAR] > 0 && this-> sonarArray[RIGHT_SONAR] < 0.3){
+                this->twist.angular.z = V_ESQUERDA * (1 - this-> sonarArray[RIGHT_SONAR]) ;            
+        } else if (this->sonarArray[RIGHT_SONAR] > 0.5){
+                this->twist.angular.z = V_DIREITA * (this-> sonarArray[RIGHT_SONAR]) ;            
+        } 
+        
+        
+    }
     /**
     * Bug Manager: Decides which sub-routine shall be called.
     */
@@ -80,8 +95,7 @@ namespace bug{
         
         switch (state){
             // State 0: Nothing to do.
-            case 0: //Reseta a flag do sensor frontal
-                    if (distanceToGoal > 0.1){ // Robot is far from the goal
+            case 0: if (distanceToGoal > 0.1){ // Robot is far from the goal
                         // Change to "Go to point" state.
                         state = 1;
                     }
@@ -127,7 +141,7 @@ namespace bug{
                         }
                         //If found Hm, its continue to goToPoint
                         if (fabs(math::DeltaPointLine( this->odometry.pose.pose.position, this->goal, this->start))< 0.5)   
-                            state = 0;                             
+                            state = 1;                             
                     
                     break;
         }
