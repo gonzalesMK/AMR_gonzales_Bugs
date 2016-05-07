@@ -31,9 +31,15 @@ double normalizeAngle(double theta){
 Return the value of the Y - Ym coordinate of the X actual point in the line formed by Points Start and Goal
 */
 double DeltaPointLine (geometry_msgs::Point &actual,geometry_msgs::Point &goal,geometry_msgs::Point &start){
-    double Y = (start.y - goal.y)/(start.x-goal.x) * (actual.x - goal.x);
-   
-    return (Y - goal.y) ;
+    double Y;
+    if( (start.x-goal.x) != 0){
+        Y = (start.y - goal.y)/(start.x-goal.x) * (actual.x - goal.x);
+        return (Y - goal.y) ;
+    }
+    else{
+        Y = actual.x;
+        return( Y - goal.x);
+    }
 }
     
 }

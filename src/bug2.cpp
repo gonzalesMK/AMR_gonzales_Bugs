@@ -4,10 +4,6 @@
 //Flag para o sensor frontal
 
 namespace bug{
-    /** constantes
-    */
-    const double V_ESQUERDA = -5;
-    const double V_ESQUERDA = 5;
     /**
     *  Empty constructor
     */
@@ -43,7 +39,7 @@ namespace bug{
 
           if ( fabs(delta) > 0.2 ){
             this->twist.angular.z = delta * 3;
-            this->twist.linear.x =(M_PI - fabs(delta))*1 ;
+           this->twist.linear.x = 0;   //(M_PI - fabs(delta))*1 ;
           } else {
             this->twist.angular.z = delta * 1 ;
             this->twist.linear.x = 1;
@@ -56,23 +52,32 @@ namespace bug{
     * Wall Following function: Computes desired twist that allows robot circum-navagiating a wall/obstacle.
     */
     void Bug2::wallFollower(void){
+      /** constantes
+        */
+        const double V_ESQUERDA = 1;
+        const double V_DIREITA = -1;
+        const double V_FRENTE = 1;
+    
         // Se o sensor da frente ativar...
         if( this->sonarArray[FRONT_SONAR] > 0 ){
-            //Se o sensor lateral esquerdo não estiver ativado, o carro vira para a ESQUERDA
-            if (this->sonarArrau[LEFT_SONAR] == 0){
-                this->twist.angular.z = V_ESQUERDA;
-            } else {
-            //Senão vira para a DIREITA
-                this->twist.angular.z = V_DIREITA;
-            }
-            
-        } else if (this->sonarArray[RIGHT_SONAR] > 0 && this-> sonarArray[RIGHT_SONAR] < 0.3){
+                this->twist.linear.x = V_FRENTE * 0.5;
+                //Se o sensor lateral esquerdo não estiver ativado, o carro vira para a ESQUERDA
+                if (this->sonarArray[LEFT_SONAR] == 0){
+                    this->twist.angular.z = V_ESQUERDA;
+                } else {
+                    //Senão vira para a DIREITA
+                    this->twist.angular.z = V_DIREITA;
+                }
+        //caso o sensor da frente não seja ativado, o lateral direito mantem a distância correta do obstáculo     
+        } else if (this->sonarArray[RIGHT_SONAR] > 0 && this-> sonarArray[RIGHT_SONAR] < 0.35){
                 this->twist.angular.z = V_ESQUERDA * (1 - this-> sonarArray[RIGHT_SONAR]) ;            
+                this->twist.linear.x = V_FRENTE ;
         } else if (this->sonarArray[RIGHT_SONAR] > 0.5){
                 this->twist.angular.z = V_DIREITA * (this-> sonarArray[RIGHT_SONAR]) ;            
+                this->twist.linear.x = V_FRENTE * 0.8;
         } 
         
-        
+    std::cout << this->sonarArray[RIGHT_SONAR] << std::endl ;
     }
     /**
     * Bug Manager: Decides which sub-routine shall be called.
@@ -90,7 +95,7 @@ namespace bug{
         double distanceToH_out = math::distance2D(this->odometry.pose.pose.position, this->h_out);
         
         std::cout << "state: " << state << std::endl;
-        std::cout << "Ponto Y: " << fabs(math::DeltaPointLine( this->odometry.pose.pose.position, this->goal, this->start)) << std::endl;
+        std::cout << "Ponto DeltaY: " << fabs(math::DeltaPointLine( this->odometry.pose.pose.position, this->goal, this->start)) << std::endl;
 
         
         switch (state){
@@ -140,7 +145,7 @@ namespace bug{
                             while(true);
                         }
                         //If found Hm, its continue to goToPoint
-                        if (fabs(math::DeltaPointLine( this->odometry.pose.pose.position, this->goal, this->start))< 0.5)   
+                        if (fabs(math::DeltaPointLine( this->odometry.pose.pose.position, this->goal, this->start))< 0.1)   
                             state = 1;                             
                     
                     break;
